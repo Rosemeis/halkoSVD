@@ -29,11 +29,11 @@ Provide `halko` with the file-prefix of the PLINK files.
 halko -h
 
 # GPU batch-based with batch-size of 8192 SNPs
-halko --plink input --threads 8 --n_eig 10 --batch 8192 --out halko.gpu
+halko --bfile input --threads 8 --n_eig 10 --batch 8192 --out halko.gpu
 
 # CPU batch-based with batch-size of 8192 SNPs
-halko --plink input --threads 8 --n_eig 10 --batch 8192 --cpu --out halko.cpu
+halko --bfile input --threads 8 --n_eig 10 --batch 8192 --cpu --out halko.cpu
 
 # CPU but loading all data into memory
-halko --plink input --threads 8 --n_eig 10 --full --out halko.cpu.full
+halko --bfile input --threads 8 --n_eig 10 --full --out halko.cpu.full
 ```

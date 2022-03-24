@@ -18,7 +18,7 @@ def extract_length(filename):
 
 # Argparse
 parser = argparse.ArgumentParser(prog="HalkoGPU")
-parser.add_argument("-p", "--plink", metavar="FILE-PREFIX",
+parser.add_argument("-p", "--bfile", metavar="FILE-PREFIX",
                     help="Prefix PLINK files (.bed, .bim, .fam)")
 parser.add_argument("-e", "--n_eig", metavar="INT", type=int, default=10,
                     help="Number of eigenvectors to extract")

@@ -6,7 +6,7 @@ from cython import boundscheck, wraparound
 from libc.math cimport sqrt, fabs
 
 # Load and generate standardized batch array
-cpdef plinkLoad(unsigned char[:,::1] D, float[:,::1] A, float[::1] f,
+cpdef plinkLoad(unsigned char[::1] D, float[:,::1] A, float[::1] f,
 				int[::1] c, int Bi, int n, int m, int t):
 	cdef signed char[4] recode = [2, 9, 1, 0]
 	cdef unsigned char mask = 3
@@ -16,7 +16,7 @@ cpdef plinkLoad(unsigned char[:,::1] D, float[:,::1] A, float[::1] f,
 		for j in prange(m, num_threads=t):
 			i = 0
 			for b in range(Bi):
-				byte = D[j,b]
+				byte = D[j*Bi + b]
 				for bytepart in range(4):
 					code = recode[byte & mask]
 					if code != 9:
