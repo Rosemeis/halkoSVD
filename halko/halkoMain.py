@@ -44,7 +44,7 @@ def main():
         parser.print_help()
         sys.exit()
     print("PCAone Halko CPU/GPU implementation")
-    assert args.plink is not None, "No input data (-plink)!"
+    assert args.bfile is not None, "No input data (--bfile)!"
     if args.cpu or args.full:
         if args.full:
             print("Full CPU implementation")
@@ -66,21 +66,21 @@ def main():
     from halko import halkoFunctions
 
     # Finding length of .fam and .bim files
-    n = extract_length(args.plink + ".fam")
-    m = extract_length(args.plink + ".bim")
+    n = extract_length(args.bfile + ".fam")
+    m = extract_length(args.bfile + ".bim")
     print("Data: {} samples, {} SNPs".format(n, m))
 
     # Perform SVD
     print("Extracting {} eigenvectors".format(args.n_eig))
     if args.cpu or args.full:
         if args.full:
-            U, s, V = halkoFunctions.halkoCPU(args.plink + ".bed", m, n, \
+            U, s, V = halkoFunctions.halkoCPU(args.bfile + ".bed", m, n, \
 						args.n_eig, args.power, args.threads)
         else:
-            U, s, V = halkoFunctions.halkoCPUbatch(args.plink + ".bed", m, n, \
+            U, s, V = halkoFunctions.halkoCPUbatch(args.bfile + ".bed", m, n, \
 						args.batch, args.n_eig, args.power, args.threads)
     else:
-        U, s, V = halkoFunctions.halkoGPUbatch(args.plink + ".bed", m, n, \
+        U, s, V = halkoFunctions.halkoGPUbatch(args.bfile + ".bed", m, n, \
 						args.batch, args.n_eig, args.power, args.threads)
 
     # Save matrices
