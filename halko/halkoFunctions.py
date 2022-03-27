@@ -6,7 +6,10 @@ __author__ = "Jonas Meisner"
 
 # Libraries
 import numpy as np
-import cupy as cp
+try:
+	import cupy as cp
+except:
+	pass
 from math import ceil
 
 # Import own scripts

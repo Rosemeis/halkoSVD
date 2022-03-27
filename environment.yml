@@ -1,4 +1,4 @@
-name: halkoGPU
+name: halkoSVD
 channels:
   - defaults
   - conda-forge

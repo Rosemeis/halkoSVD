@@ -60,7 +60,10 @@ def main():
 
     # Import numerical libraries
     import numpy as np
-    import cupy as cp
+    try:
+        import cupy as cp
+    except:
+        print("CuPy not installed correctly! Only CPU implementations will work at your own risk.")
 
     # Import own scripts
     from halko import halkoFunctions
