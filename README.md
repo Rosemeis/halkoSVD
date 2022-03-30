@@ -14,7 +14,7 @@ Please install the implementation using a *conda* environment:
 conda env create -f environment.yml
 
 # Download and install
-git clone https://github.com/Rosemeis/halkoGPU.git
+git clone https://github.com/Rosemeis/halkoSVD.git
 cd halkoSVD
 python setup.py build_ext --inplace
 pip3 install -e .

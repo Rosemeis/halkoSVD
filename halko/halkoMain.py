@@ -17,7 +17,7 @@ def extract_length(filename):
     return int(result.split()[0])
 
 # Argparse
-parser = argparse.ArgumentParser(prog="HalkoGPU")
+parser = argparse.ArgumentParser(prog="halko")
 parser.add_argument("-p", "--bfile", metavar="FILE-PREFIX",
                     help="Prefix PLINK files (.bed, .bim, .fam)")
 parser.add_argument("-e", "--n_eig", metavar="INT", type=int, default=10,
@@ -63,6 +63,7 @@ def main():
     try:
         import cupy as cp
     except:
+        assert args.cpu or args.full, "No CuPy or GPU detected. Use --cpu or --full!"
         print("CuPy not installed correctly! Only CPU implementations will work at your own risk.")
 
     # Import own scripts
