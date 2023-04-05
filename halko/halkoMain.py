@@ -9,6 +9,7 @@ import argparse
 import os
 import sys
 import subprocess
+from time import time
 
 # Find length of PLINK files
 def extract_length(filename):
@@ -35,6 +36,7 @@ parser.add_argument("--loadings", action="store_true",
 
 ##### PCAone Halko #####
 def main():
+	start = time()
 	args = parser.parse_args()
 	if len(sys.argv) < 2:
 		parser.print_help()
@@ -77,6 +79,10 @@ def main():
 	if args.loadings:
 		np.savetxt(args.out + ".loadings", U, fmt="%.7f")
 		print("Saved SNP loadings as {}.loadings".format(args.out))
+	t_tot = time()-start
+	t_min = int(t_tot//60)
+	t_sec = int(t_tot - t_min*60)
+	print(f"Total elapsed time {t_min}m{t_sec}s")
 
 
 
