@@ -70,7 +70,7 @@ def main():
 	# Save matrices
 	np.savetxt(args.out + ".eigenvecs", V.T, fmt="%.7f")
 	print(f"Saved eigenvector(s) as {args.out}.eigenvecs")
-	np.savetxt(args.out + ".eigenvals", s**2/float(m), fmt="%.7f")
+	np.savetxt(args.out + ".eigenvals", S**2/float(m), fmt="%.7f")
 	print(f"Saved eigenvalue(s) as {args.out}.eigenvals")
 
 	# Save loadings

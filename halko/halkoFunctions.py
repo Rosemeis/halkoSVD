@@ -29,10 +29,10 @@ def halko(file, M, N, K, p_iter, threads):
 		H = np.dot(A.T, G)
 	Q, R = np.linalg.qr(G, mode="reduced")
 	B = np.linalg.solve(R.T, H.T)
-	Uhat, s, V = np.linalg.svd(B, full_matrices=False)
+	Uhat, S, V = np.linalg.svd(B, full_matrices=False)
 	del B
 	U = np.dot(Q, Uhat)
-	return U[:,:K], s[:K], V[:K,:]
+	return U[:,:K], S[:K], V[:K,:]
 
 ### Out-of-core batched PCAone Halko ###
 def halkoBatch(file, M, N, B, K, p_iter, threads):
@@ -72,7 +72,7 @@ def halkoBatch(file, M, N, B, K, p_iter, threads):
 				c.fill(0)
 	Q, R = np.linalg.qr(G, mode="reduced")
 	B = np.linalg.solve(R.T, H.T)
-	Uhat, s, V = np.linalg.svd(B, full_matrices=False)
+	Uhat, S, V = np.linalg.svd(B, full_matrices=False)
 	del B
 	U = np.dot(Q, Uhat)
-	return U[:,:K], s[:K], V[:K,:]
+	return U[:,:K], S[:K], V[:K,:]
