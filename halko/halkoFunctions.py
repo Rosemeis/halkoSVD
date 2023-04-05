@@ -19,6 +19,7 @@ def halko(file, M, N, K, p_iter, threads):
 	c = np.zeros(M, dtype=int)
 	with open(file, "rb") as bed: # Read binary bed-file
 		D = np.fromfile(bed, dtype=np.uint8, offset=3)
+	D.shape = (M, Bi)
 	shared_cy.plinkLoad(D, A, f, c, Bi, N, M, threads)
 	del D, f, c
 	Omg = np.random.standard_normal(size=(N, K+10))
@@ -56,6 +57,7 @@ def halkoBatch(file, M, N, B, K, p_iter, threads):
 				c = np.zeros(M - b*B, dtype=int)
 				with open(file, "rb") as bed: # Read binary bed-file
 					D = np.fromfile(bed, dtype=np.uint8, count=(M-b*B)*Bi, offset=3 + (b*B)*Bi)
+				D.shape = (M-b*B, Bi)
 				shared_cy.plinkLoad(D, A, f, c, Bi, N, M-b*B, threads)
 				del D
 				G[(b*B):M] = np.dot(A, Omg)
@@ -64,6 +66,7 @@ def halkoBatch(file, M, N, B, K, p_iter, threads):
 			else:
 				with open(file, "rb") as bed: # Read binary bed-file
 					D = np.fromfile(bed, dtype=np.uint8, count=B*Bi, offset=3 + (b*B)*Bi)
+				D.shape = (B, Bi)
 				shared_cy.plinkLoad(D, A, f, c, Bi, N, B, threads)
 				del D
 				G[(b*B):((b+1)*B)] = np.dot(A, Omg)
