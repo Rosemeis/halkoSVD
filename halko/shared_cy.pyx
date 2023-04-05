@@ -6,7 +6,7 @@ from libc.math cimport sqrt, fabs
 
 # Load and generate standardized batch array
 cpdef plinkLoad(unsigned char[::1] D, double[:,::1] A, double[::1] f,
-				int[::1] c, int Bi, int n, int m, int t):
+				long[::1] c, int Bi, int n, int m, int t):
 	cdef signed char[4] recode = [2, 9, 1, 0]
 	cdef unsigned char mask = 3
 	cdef unsigned char byte, code
