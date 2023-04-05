@@ -16,7 +16,7 @@ def halko(file, M, N, K, p_iter, threads):
 	Bi = ceil(N/4) # Length of bytes to describe n individuals
 	A = np.zeros((M, N))
 	f = np.zeros(M)
-	c = np.zeros(M)
+	c = np.zeros(M, dtype=int)
 	with open(file, "rb") as bed: # Read binary bed-file
 		D = np.fromfile(bed, dtype=np.uint8, offset=3)
 	shared_cy.plinkLoad(D, A, f, c, Bi, N, M, threads)
@@ -44,7 +44,7 @@ def halkoBatch(file, M, N, B, K, p_iter, threads):
 	for p in range(p_iter):
 		A = np.zeros((B, N))
 		f = np.zeros(B)
-		c = np.zeros(B)
+		c = np.zeros(B, dtype=int)
 		if p > 0:
 			Omg, _ = np.linalg.qr(H, mode="reduced")
 			H.fill(0.0)
@@ -53,7 +53,7 @@ def halkoBatch(file, M, N, B, K, p_iter, threads):
 				del A, f, c # Ensure no extra copy
 				A = np.zeros((M - b*B, N))
 				f = np.zeros(M - b*B)
-				c = np.zeros(M - b*B)
+				c = np.zeros(M - b*B, dtype=int)
 				with open(file, "rb") as bed: # Read binary bed-file
 					D = np.fromfile(bed, dtype=np.uint8, count=(M-b*B)*Bi, offset=3 + (b*B)*Bi)
 				shared_cy.plinkLoad(D, A, f, c, Bi, N, M-b*B, threads)
