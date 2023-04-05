@@ -12,7 +12,7 @@ from math import ceil
 from halko import shared_cy
 
 ### PCAone Halko with full data in memory ###
-def halko(file, M, N, K, p_iter, threads):
+def halko(file, M, N, K, p_iter, seed, threads):
 	Bi = ceil(N/4) # Length of bytes to describe n individuals
 	A = np.zeros((M, N))
 	f = np.zeros(M)
@@ -22,6 +22,7 @@ def halko(file, M, N, K, p_iter, threads):
 	D.shape = (M, Bi)
 	shared_cy.plinkLoad(D, A, f, c, Bi, N, M, threads)
 	del D, f, c
+	np.random.seed(seed) # Set random seed
 	Omg = np.random.standard_normal(size=(N, K+10))
 	for p in range(p_iter):
 		if p > 0:
@@ -36,9 +37,10 @@ def halko(file, M, N, K, p_iter, threads):
 	return U[:,:K], S[:K], V[:K,:]
 
 ### Out-of-core batched PCAone Halko ###
-def halkoBatch(file, M, N, B, K, p_iter, threads):
+def halkoBatch(file, M, N, B, K, p_iter, seed, threads):
 	L = K + 10
 	Bi = ceil(N/4) # Length of bytes to describe n individuals
+	np.random.seed(seed) # Set random seed
 	Omg = np.random.standard_normal(size=(N, L))
 	G = np.zeros((M, L))
 	H = np.zeros((N, L))

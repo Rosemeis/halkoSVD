@@ -25,6 +25,8 @@ parser.add_argument("-e", "--n_eig", metavar="INT", type=int, default=10,
 	help="Number of eigenvectors to extract")
 parser.add_argument("-t", "--threads", metavar="INT", type=int, default=1,
 	help="Number of threads to use")
+parser.add_argument("-s", "--seed", metavar="INT", type=int, default=0,
+	help="Set random seed")
 parser.add_argument("-o", "--out", metavar="OUTPUT", default="halko",
 	help="Prefix output name")
 parser.add_argument("--batch", metavar="INT", type=int,
@@ -64,10 +66,10 @@ def main():
 	print(f"Extracting {args.n_eig} eigenvectors")
 	if args.batch is None:
 		U, S, V = halkoFunctions.halko(args.bfile + ".bed", M, N, \
-			args.n_eig, args.power, args.threads)
+			args.n_eig, args.power, args.seed, args.threads)
 	else:
 		U, S, V = halkoFunctions.halkoBatch(args.bfile + ".bed", M, N, \
-			args.batch, args.n_eig, args.power, args.threads)
+			args.batch, args.n_eig, args.power, args.seed, args.threads)
 
 	# Save matrices
 	np.savetxt(args.out + ".eigenvecs", V.T, fmt="%.7f")
