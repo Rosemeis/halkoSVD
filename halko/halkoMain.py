@@ -60,10 +60,12 @@ def main():
 
 	# Perform SVD
 	print(f"Extracting {args.n_eig} eigenvectors")
-	U, S, V = halkoFunctions.halko(args.bfile + ".bed", M, N, \
-		args.n_eig, args.power, args.threads)
-	U, S, V = halkoFunctions.halkoBatch(args.bfile + ".bed", M, N, \
-		args.batch, args.n_eig, args.power, args.threads)
+	if args.batch is None:
+		U, S, V = halkoFunctions.halko(args.bfile + ".bed", M, N, \
+			args.n_eig, args.power, args.threads)
+	else:
+		U, S, V = halkoFunctions.halkoBatch(args.bfile + ".bed", M, N, \
+			args.batch, args.n_eig, args.power, args.threads)
 
 	# Save matrices
 	np.savetxt(args.out + ".eigenvecs", V.T, fmt="%.7f")
