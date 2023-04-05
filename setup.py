@@ -13,9 +13,9 @@ extensions = [
 ]
 
 setup(
-    name="Halko CPU/GPU",
+    name="halko",
     version="0.1",
-    description="CPU/GPU implementations of the PCAone Halko algorithm",
+    description="Fast implementation of the PCAone Halko algorithm",
     author="Jonas Meisner",
     packages=["halko"],
     entry_points={

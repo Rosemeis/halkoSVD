@@ -6,7 +6,7 @@ from cython import boundscheck, wraparound
 from libc.math cimport sqrt, fabs
 
 # Load and generate standardized batch array
-cpdef plinkLoad(unsigned char[::1] D, float[:,::1] A, float[::1] f,
+cpdef plinkLoad(unsigned char[::1] D, double[:,::1] A, double[::1] f,
 				int[::1] c, int Bi, int n, int m, int t):
 	cdef signed char[4] recode = [2, 9, 1, 0]
 	cdef unsigned char mask = 3
@@ -21,13 +21,13 @@ cpdef plinkLoad(unsigned char[::1] D, float[:,::1] A, float[::1] f,
 					code = recode[byte & mask]
 					if code != 9:
 						c[j] = c[j] + 1
-						f[j] = f[j] + <float>code
-					A[j, i] = <float>code
+						f[j] = f[j] + <double>code
+					A[j, i] = <double>code
 					byte = byte >> 2 # Right shift 2 bits
 					i = i + 1
 					if i == n: # Estimate allele frequency and move to next SNP
 						if c[j] > 0:
-							f[j] = f[j]/(2.0*<float>c[j])
+							f[j] = f[j]/(2.0*<double>c[j])
 						else:
 							f[j] = 0.0
 						break
