@@ -13,8 +13,11 @@ from halko import shared_cy
 
 ### PCAone Halko with full data in memory ###
 def halko(file, M, N, K, p_iter, seed, threads):
+	L = K + 10
 	Bi = ceil(N/4) # Length of bytes to describe n individuals
 	A = np.zeros((M, N))
+	G = np.zeros((M, L))
+	H = np.zeros((N, L))
 	f = np.zeros(M)
 	c = np.zeros(M, dtype=int)
 	with open(file, "rb") as bed: # Read binary bed-file
@@ -27,8 +30,8 @@ def halko(file, M, N, K, p_iter, seed, threads):
 	for p in range(p_iter):
 		if p > 0:
 			Omg, _ = np.linalg.qr(H, mode="reduced")
-		G = np.dot(A, Omg)
-		H = np.dot(A.T, G)
+		np.dot(A, Omg, out=G)
+		np.dot(A.T, G, out=H)
 	Q, R = np.linalg.qr(G, mode="reduced")
 	B = np.linalg.solve(R.T, H.T)
 	Uhat, S, V = np.linalg.svd(B, full_matrices=False)
