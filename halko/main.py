@@ -8,6 +8,7 @@ __author__ = "Jonas Meisner"
 import argparse
 import os
 import sys
+from math import ceil
 from time import time
 
 # Argparse
@@ -61,6 +62,8 @@ def main():
 	M = functions.extract_length(f"{args.bfile}.bim")
 	with open(f"{args.bfile}.bed", "rb") as bed:
 		G = np.fromfile(bed, dtype=np.uint8, offset=3)
+	B = ceil(N/4)
+	G.shape = (M, B)
 	print(f"Loaded data: {N} samples, {M} SNPs")
 
 	# Estimate allele frequencies
