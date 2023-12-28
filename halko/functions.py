@@ -64,7 +64,6 @@ def fullSVD(G, f, N, K, power, seed, threads):
 			O, _ = np.linalg.qr(H, mode="reduced")			
 		np.dot(X, O, out=A)
 		np.dot(X.T, A, out=H)
-	del X # Deallocate big memory
 	Q, R = np.linalg.qr(A, mode="reduced")
 	B = np.linalg.solve(R.T, H.T)
 	Uhat, S, V = np.linalg.svd(B, full_matrices=False)
