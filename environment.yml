@@ -1,7 +1,7 @@
 name: halkoSVD
 channels:
-  - defaults
+  - default
 dependencies:
-  - python>=3.6
-  - numpy
+  - python
   - cython
+  - numpy
