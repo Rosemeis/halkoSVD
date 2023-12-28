@@ -25,8 +25,8 @@ parser.add_argument("-o", "--out", metavar="OUTPUT", default="halko",
 	help="Prefix output name (halko)")
 parser.add_argument("--power", metavar="INT", type=int, default=11,
 	help="Number of power iterations to perform (11)")
-parser.add_argument("--batch", metavar="INT", type=int, default=10000,
-	help="Mini-batch size for randomized SVD (10000)")
+parser.add_argument("--batch", metavar="INT", type=int, default=8192,
+	help="Mini-batch size for randomized SVD (8192)")
 parser.add_argument("--loadings", action="store_true",
 	help="Save loadings")
 
@@ -73,7 +73,7 @@ def main():
 
 	# Perform Randomized SVD
 	print(f"Extracting {args.pca} eigenvectors.")
-	U, S, V = functions.randomizedSVD(G, f, N, args.batch, args.pca, args.power, \
+	U, S, V = functions.randomizedSVD(G, f, N, args.pca, args.batch, args.power, \
 		args.seed, args.threads)
 
 	# Save matrices
