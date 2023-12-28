@@ -73,7 +73,7 @@ def main():
 
 	# Perform Randomized SVD
 	print(f"Extracting {args.pca} eigenvectors.")
-	U, S, V = functions.svd(G, f, N, args.batch, args.pca, args.power, \
+	U, S, V = functions.randomizedSVD(G, f, N, args.batch, args.pca, args.power, \
 		args.seed, args.threads)
 
 	# Save matrices
