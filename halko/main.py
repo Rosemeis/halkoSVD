@@ -28,7 +28,7 @@ parser.add_argument("--power", metavar="INT", type=int, default=11,
 parser.add_argument("--batch", metavar="INT", type=int, default=8192,
 	help="Mini-batch size for randomized SVD (8192)")
 parser.add_argument("--full", action="store_true",
-	help="Perform randomized SVD in memory")
+	help="Perform full randomized SVD in memory")
 parser.add_argument("--loadings", action="store_true",
 	help="Save loadings")
 
