@@ -25,8 +25,8 @@ parser.add_argument("-o", "--out", metavar="OUTPUT", default="halko",
 	help="Prefix output name (halko)")
 parser.add_argument("--power", metavar="INT", type=int, default=11,
 	help="Number of power iterations to perform (11)")
-parser.add_argument("--batch", metavar="INT", type=int, default=8192,
-	help="Mini-batch size for randomized SVD (8192)")
+parser.add_argument("--batch", metavar="INT", type=int, default=4096,
+	help="Mini-batch size for randomized SVD (4096)")
 parser.add_argument("--full", action="store_true",
 	help="Perform full randomized SVD in memory")
 parser.add_argument("--loadings", action="store_true",
