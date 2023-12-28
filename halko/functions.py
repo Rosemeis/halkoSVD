@@ -19,8 +19,8 @@ def extract_length(filename):
 	return int(result.split()[0])
 
 
-### Randomized SVD (PCAone Halko)
-def randomizedSVD(G, f, N, K, batch, power, seed, threads):
+### Mini-batch randomized SVD (PCAone Halko)
+def batchSVD(G, f, N, K, batch, power, seed, threads):
 	M = G.shape[0]
 	W = ceil(M/batch)
 	L = K + 16
@@ -46,6 +46,28 @@ def randomizedSVD(G, f, N, K, batch, power, seed, threads):
 	Uhat, S, V = np.linalg.svd(B, full_matrices=False)
 	U = np.dot(Q, Uhat)
 	del A, B, H, O, Q, R, Uhat, X
-	U = np.ascontiguousarray(U[:,:K])
-	V = np.ascontiguousarray(V[:K,:].T)
-	return U, S[:K], V
+	return U[:,:K], S[:K], V[:K,:]
+
+
+### Full randomized SVD (PCAone Halko)
+def fullSVD(G, f, N, K, power, seed, threads):
+	M = G.shape[0]
+	L = K + 16
+	rng = np.random.default_rng(seed)
+	O = rng.standard_normal(size=(N, L))
+	A = np.zeros((M, L))
+	H = np.zeros((N, L))
+	X = np.zeros((M, N))
+	shared.plinkChunk(G, X, f, 0, threads)
+	for p in range(power):
+		if p > 0:
+			O, _ = np.linalg.qr(H, mode="reduced")			
+		np.dot(X, O, out=A)
+		np.dot(X.T, A, out=H)
+	del X # Deallocate big memory
+	Q, R = np.linalg.qr(A, mode="reduced")
+	B = np.linalg.solve(R.T, H.T)
+	Uhat, S, V = np.linalg.svd(B, full_matrices=False)
+	U = np.dot(Q, Uhat)
+	del A, B, H, O, Q, R, Uhat, X
+	return U[:,:K], S[:K], V[:K,:]

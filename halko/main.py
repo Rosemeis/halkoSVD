@@ -27,6 +27,8 @@ parser.add_argument("--power", metavar="INT", type=int, default=11,
 	help="Number of power iterations to perform (11)")
 parser.add_argument("--batch", metavar="INT", type=int, default=8192,
 	help="Mini-batch size for randomized SVD (8192)")
+parser.add_argument("--full", action="store_true",
+	help="Perform randomized SVD in memory")
 parser.add_argument("--loadings", action="store_true",
 	help="Save loadings")
 
@@ -39,7 +41,10 @@ def main():
 		parser.print_help()
 		sys.exit()
 	print(f"Fast PCAone Halko implementation using {args.threads} thread(s).")
-	print(f"Computing randomized SVD with a batch-size of {args.batch} SNPs.")
+	if args.full:
+		print("Computing randomized SVD with data in memory.")
+	else:
+		print(f"Computing randomized SVD with a batch-size of {args.batch} SNPs.")
 	assert args.bfile is not None, "No input data (--bfile)!"
 	start = time()
 
@@ -73,8 +78,12 @@ def main():
 
 	# Perform Randomized SVD
 	print(f"Extracting {args.pca} eigenvectors.")
-	U, S, V = functions.randomizedSVD(G, f, N, args.pca, args.batch, args.power, \
-		args.seed, args.threads)
+	if args.full:
+		U, S, V = functions.fullSVD(G, f, N, args.pca, args.power, args.seed, \
+			args.threads)
+	else:
+		U, S, V = functions.batchSVD(G, f, N, args.pca, args.batch, args.power, \
+			args.seed, args.threads)
 
 	# Save matrices
 	np.savetxt(f"{args.out}.eigenvecs", V.T, fmt="%.7f")
