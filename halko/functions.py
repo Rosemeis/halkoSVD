@@ -23,7 +23,7 @@ def extract_length(filename):
 def batchSVD(G, f, s, N, K, batch, power, seed, threads):
 	M = G.shape[0]
 	W = ceil(M/batch)
-	L = K + 16
+	L = K + 10
 	rng = np.random.default_rng(seed)
 	O = rng.standard_normal(size=(N, L))
 	A = np.zeros((M, L))
@@ -41,7 +41,9 @@ def batchSVD(G, f, s, N, K, batch, power, seed, threads):
 			shared.plinkChunk(G, X, f, s, M_w, threads)
 			A[M_w:(M_w + X.shape[0])] = np.dot(X, O)
 			H += np.dot(X.T, A[M_w:(M_w + X.shape[0])])
-	Q, R = np.linalg.qr(A, mode="reduced")
+	Q, R1 = np.linalg.qr(A, mode="reduced")
+	Q, R2 = np.linalg.qr(Q, mode="reduced")
+	R = np.dot(R1, R2)
 	B = np.linalg.solve(R.T, H.T)
 	Uhat, S, V = np.linalg.svd(B, full_matrices=False)
 	U = np.dot(Q, Uhat)
@@ -52,7 +54,7 @@ def batchSVD(G, f, s, N, K, batch, power, seed, threads):
 ### Full randomized SVD (PCAone Halko)
 def fullSVD(G, f, s, N, K, power, seed, threads):
 	M = G.shape[0]
-	L = K + 16
+	L = K + 10
 	rng = np.random.default_rng(seed)
 	O = rng.standard_normal(size=(N, L))
 	A = np.zeros((M, L))
@@ -64,7 +66,9 @@ def fullSVD(G, f, s, N, K, power, seed, threads):
 			O, _ = np.linalg.qr(H, mode="reduced")			
 		np.dot(X, O, out=A)
 		np.dot(X.T, A, out=H)
-	Q, R = np.linalg.qr(A, mode="reduced")
+	Q, R1 = np.linalg.qr(A, mode="reduced")
+	Q, R2 = np.linalg.qr(Q, mode="reduced")
+	R = np.dot(R1, R2)
 	B = np.linalg.solve(R.T, H.T)
 	Uhat, S, V = np.linalg.svd(B, full_matrices=False)
 	U = np.dot(Q, Uhat)
