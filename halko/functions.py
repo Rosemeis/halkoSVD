@@ -20,7 +20,7 @@ def extract_length(filename):
 
 
 ### Mini-batch randomized SVD (PCAone Halko)
-def batchSVD(G, f, N, K, batch, power, seed, threads):
+def batchSVD(G, f, s, N, K, batch, power, seed, threads):
 	M = G.shape[0]
 	W = ceil(M/batch)
 	L = K + 16
@@ -38,7 +38,7 @@ def batchSVD(G, f, N, K, batch, power, seed, threads):
 			if w == (W-1): # Last batch
 				del X # Ensure no extra copy
 				X = np.zeros((M - M_w, N))
-			shared.plinkChunk(G, X, f, M_w, threads)
+			shared.plinkChunk(G, X, f, s, M_w, threads)
 			A[M_w:(M_w + X.shape[0])] = np.dot(X, O)
 			H += np.dot(X.T, A[M_w:(M_w + X.shape[0])])
 	Q, R = np.linalg.qr(A, mode="reduced")
@@ -50,7 +50,7 @@ def batchSVD(G, f, N, K, batch, power, seed, threads):
 
 
 ### Full randomized SVD (PCAone Halko)
-def fullSVD(G, f, N, K, power, seed, threads):
+def fullSVD(G, f, s, N, K, power, seed, threads):
 	M = G.shape[0]
 	L = K + 16
 	rng = np.random.default_rng(seed)
@@ -58,7 +58,7 @@ def fullSVD(G, f, N, K, power, seed, threads):
 	A = np.zeros((M, L))
 	H = np.zeros((N, L))
 	X = np.zeros((M, N))
-	shared.plinkChunk(G, X, f, 0, threads)
+	shared.plinkChunk(G, X, f, s, 0, threads)
 	for p in range(power):
 		if p > 0:
 			O, _ = np.linalg.qr(H, mode="reduced")			

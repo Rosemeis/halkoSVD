@@ -31,6 +31,8 @@ parser.add_argument("--full", action="store_true",
 	help="Perform full randomized SVD in memory")
 parser.add_argument("--loadings", action="store_true",
 	help="Save loadings")
+parser.add_argument("--raw", action="store_true",
+	help="Raw output without '*.fam' info")
 
 
 
@@ -71,22 +73,28 @@ def main():
 	G.shape = (M, B)
 	print(f"Loaded data: {N} samples, {M} SNPs")
 
-	# Estimate allele frequencies
+	# Estimate allele frequencies and scaling
 	f = np.zeros(M)
 	shared.estimateFreq(G, f, N, args.threads)
 	assert (np.min(f) > 0.0) & (np.max(f) < 1.0), "Please perform MAF filtering!"
+	s = np.power(2*f*(1-f), -0.5)
 
 	# Perform Randomized SVD
 	print(f"Extracting {args.pca} eigenvectors.")
 	if args.full:
-		U, S, V = functions.fullSVD(G, f, N, args.pca, args.power, args.seed, \
+		U, S, V = functions.fullSVD(G, f, s, N, args.pca, args.power, args.seed, \
 			args.threads)
 	else:
-		U, S, V = functions.batchSVD(G, f, N, args.pca, args.batch, args.power, \
+		U, S, V = functions.batchSVD(G, f, s, N, args.pca, args.batch, args.power, \
 			args.seed, args.threads)
 
 	# Save matrices
-	np.savetxt(f"{args.out}.eigenvecs", V.T, fmt="%.7f")
+	if args.raw:
+		np.savetxt(f"{args.out}.eigenvecs", V.T, fmt="%.7f")
+	else:
+		F = np.loadtxt(f"{args.bfile}.fam", usecols=[0,1], dtype=np.str_)
+		V = np.hstack((F, np.round(V.T, 7)))
+		np.savetxt(f"{args.out}.eigenvecs", V, fmt="%s")
 	print(f"Saved eigenvector(s) as {args.out}.eigenvecs")
 	np.savetxt(f"{args.out}.eigenvals", S**2/float(M), fmt="%.7f")
 	print(f"Saved eigenvalue(s) as {args.out}.eigenvals")
