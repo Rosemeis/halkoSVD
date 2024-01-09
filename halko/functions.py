@@ -23,7 +23,7 @@ def extract_length(filename):
 def batchSVD(G, f, s, N, K, batch, power, seed, threads):
 	M = G.shape[0]
 	W = ceil(M/batch)
-	L = K + 10
+	L = K + 16
 	rng = np.random.default_rng(seed)
 	O = rng.standard_normal(size=(N, L))
 	A = np.zeros((M, L))
@@ -54,7 +54,7 @@ def batchSVD(G, f, s, N, K, batch, power, seed, threads):
 ### Full randomized SVD (PCAone Halko)
 def fullSVD(G, f, s, N, K, power, seed, threads):
 	M = G.shape[0]
-	L = K + 10
+	L = K + 16
 	rng = np.random.default_rng(seed)
 	O = rng.standard_normal(size=(N, L))
 	A = np.zeros((M, L))
