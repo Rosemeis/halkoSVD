@@ -11,7 +11,7 @@ cpdef void estimateFreq(unsigned char[:,::1] G, double[::1] f, int N, int t) \
 		int M = G.shape[0]
 		int B = G.shape[1]
 		int i, j, b, bytepart
-		double g, n
+		double n
 		unsigned char[4] recode = [0, 9, 1, 2]
 		unsigned char mask = 3
 		unsigned char byte
@@ -37,17 +37,21 @@ cpdef void plinkChunk(unsigned char[:,::1] G, double[:,::1] X, double[::1] f, \
 		int M = X.shape[0]
 		int N = X.shape[1]
 		int B = G.shape[1]
-		int i, j, b, bytepart
+		int d, i, j, b, bytepart
+		float a, m
 		unsigned char[4] recode = [0, 9, 1, 2]
 		unsigned char mask = 3
 		unsigned char byte
 	for j in prange(M, num_threads=t):
-		i = 0
+		d = M_b + j
+		a = s[d]
+		m = 2.0*f[d]
+		i = 0		
 		for b in range(B):
-			byte = G[M_b+j,b]
+			byte = G[d,b]
 			for bytepart in range(4):
 				if recode[byte & mask] != 9:
-					X[j,i] = (<double>recode[byte & mask] - 2.0*f[M_b+j])*s[M_b+j]
+					X[j,i] = (<double>recode[byte & mask] - m)*a
 				else:
 					X[j,i] = 0.0
 				byte = byte >> 2

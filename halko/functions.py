@@ -15,7 +15,7 @@ from halko import shared
 ### Find length of PLINK files
 def extract_length(filename):
 	process = subprocess.Popen(['wc', '-l', filename], stdout=subprocess.PIPE)
-	result, err = process.communicate()
+	result, _ = process.communicate()
 	return int(result.split()[0])
 
 
