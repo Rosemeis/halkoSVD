@@ -52,9 +52,13 @@ def main():
 
 	# Control threads of external numerical libraries
 	os.environ["MKL_NUM_THREADS"] = str(args.threads)
+	os.environ["MKL_MAX_THREADS"] = str(args.threads)
 	os.environ["OMP_NUM_THREADS"] = str(args.threads)
+	os.environ["OMP_MAX_THREADS"] = str(args.threads)
 	os.environ["NUMEXPR_NUM_THREADS"] = str(args.threads)
+	os.environ["NUMEXPR_MAX_THREADS"] = str(args.threads)
 	os.environ["OPENBLAS_NUM_THREADS"] = str(args.threads)
+	os.environ["OPENBLAS_MAX_THREADS"] = str(args.threads)
 
 	# Load numerical libraries
 	import numpy as np
@@ -65,27 +69,25 @@ def main():
 	assert os.path.isfile(f"{args.bfile}.bed"), "bed file doesn't exist!"
 	assert os.path.isfile(f"{args.bfile}.bim"), "bim file doesn't exist!"
 	assert os.path.isfile(f"{args.bfile}.fam"), "fam file doesn't exist!"
-	N = functions.extract_length(f"{args.bfile}.fam")
-	M = functions.extract_length(f"{args.bfile}.bim")
-	with open(f"{args.bfile}.bed", "rb") as bed:
-		G = np.fromfile(bed, dtype=np.uint8, offset=3)
-	B = ceil(N/4)
-	G.shape = (M, B)
-	print(f"Loaded data: {N} samples, {M} SNPs")
+	print("Reading data...", end="", flush=True)
+	G, M, N = functions.readPlink(args.bfile)
+	print(f"\rLoaded {N} samples and {M} SNPs.")
 
 	# Estimate allele frequencies and scaling
 	f = np.zeros(M)
+	L = np.zeros((M, 3))
 	shared.estimateFreq(G, f, N, args.threads)
 	assert (np.min(f) > 0.0) & (np.max(f) < 1.0), "Please perform MAF filtering!"
-	s = np.power(2*f*(1-f), -0.5)
+	shared.createLookup(L, f, args.threads)
+	del f
 
 	# Perform Randomized SVD
 	print(f"Extracting {args.pca} eigenvectors.")
 	if args.full:
-		U, S, V = functions.fullSVD(G, f, s, N, args.pca, args.power, args.seed, \
+		U, S, V = functions.fullSVD(G, L, N, args.pca, args.power, args.seed, \
 			args.threads)
 	else:
-		U, S, V = functions.batchSVD(G, f, s, N, args.pca, args.batch, args.power, \
+		U, S, V = functions.batchSVD(G, L, N, args.pca, args.batch, args.power, \
 			args.seed, args.threads)
 
 	# Save matrices

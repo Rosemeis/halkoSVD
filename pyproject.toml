@@ -1,3 +1,6 @@
 [build-system]
 requires = ["setuptools", "cython", "numpy"]
 build-backend = "setuptools.build_meta"
+
+[project.urls]
+Homepage = "https://github.com/Rosemeis/halkoSVD"

@@ -1,7 +1,8 @@
 name: halkoSVD
-channels:
-  - defaults
 dependencies:
   - python
   - cython
   - numpy
+  - pip
+  - pip:
+      halkoSVD

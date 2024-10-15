@@ -5,20 +5,26 @@ It is inspired by the lovely *PCAone* software! Have a look [here](https://githu
 
 ## Install and build
 ```bash
-# Download and install
+# Install via PyPI
+pip3 install halkoSVD
+
+# Install via Conda
+conda env create -f environment.yml
+
+# Download and install from GitHub directly
 git clone https://github.com/Rosemeis/halkoSVD.git
 cd halkoSVD
 pip3 install .
 
-# You can now run the program with the `halko` command
+# You can now run the program with the `halkoSVD` command
 ```
 
 ## Quick usage
-Provide `halko` with the file prefix of the PLINK files.
+Provide `halkoSVD` with the file prefix of the PLINK files.
 ```bash
 # Check help message of the program
-halko -h
+halkoSVD -h
 
 # Extract top 10 PCs with a mini-batch size of 8192 SNPs
-halko --bfile input --threads 32 --pca 10 --batch 8192 --out halko
+halkoSVD --bfile input --threads 32 --pca 10 --batch 8192 --out halko
 ```

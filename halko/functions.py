@@ -5,29 +5,38 @@ Fast implementation of PCAone Halko algorithm.
 __author__ = "Jonas Meisner"
 
 # Libraries
-import subprocess
 import numpy as np
 from math import ceil
 
 # Import own scripts
 from halko import shared
 
-### Find length of PLINK files
-def extract_length(filename):
-	process = subprocess.Popen(['wc', '-l', filename], stdout=subprocess.PIPE)
-	result, _ = process.communicate()
-	return int(result.split()[0])
+### Read PLINK files
+def readPlink(bfile):
+	# Find length of fam-file
+	N = 0
+	with open(f"{bfile}.fam", "r") as fam:
+		for _ in fam:
+			N += 1
+	N_bytes = ceil(N/4) # Length of bytes to describe N individuals
 
+	# Read .bed file
+	with open(f"{bfile}.bed", "rb") as bed:
+		G = np.fromfile(bed, dtype=np.uint8, offset=3)
+	assert (G.shape[0] % N_bytes) == 0, "bim file doesn't match!"
+	M = G.shape[0]//N_bytes
+	G.shape = (M, N_bytes)
+	return G, M, N
 
 ### Mini-batch randomized SVD (PCAone Halko)
-def batchSVD(G, f, s, N, K, batch, power, seed, threads):
+def batchSVD(G, L, N, K, batch, power, seed, threads):
 	M = G.shape[0]
 	W = ceil(M/batch)
-	L = K + 16
+	D = K + 16
 	rng = np.random.default_rng(seed)
-	O = rng.standard_normal(size=(N, L))
-	A = np.zeros((M, L))
-	H = np.zeros((N, L))
+	O = rng.standard_normal(size=(N, D))
+	A = np.zeros((M, D))
+	H = np.zeros((N, D))
 	for p in range(power):
 		X = np.zeros((batch, N))
 		if p > 0:
@@ -38,7 +47,7 @@ def batchSVD(G, f, s, N, K, batch, power, seed, threads):
 			if w == (W-1): # Last batch
 				del X # Ensure no extra copy
 				X = np.zeros((M - M_w, N))
-			shared.plinkChunk(G, X, f, s, M_w, threads)
+			shared.plinkChunk(G, L, X, M_w, threads)
 			A[M_w:(M_w + X.shape[0])] = np.dot(X, O)
 			H += np.dot(X.T, A[M_w:(M_w + X.shape[0])])
 	Q, R1 = np.linalg.qr(A, mode="reduced")
@@ -52,15 +61,15 @@ def batchSVD(G, f, s, N, K, batch, power, seed, threads):
 
 
 ### Full randomized SVD (PCAone Halko)
-def fullSVD(G, f, s, N, K, power, seed, threads):
+def fullSVD(G, L, N, K, power, seed, threads):
 	M = G.shape[0]
-	L = K + 16
+	D = K + 16
 	rng = np.random.default_rng(seed)
-	O = rng.standard_normal(size=(N, L))
-	A = np.zeros((M, L))
-	H = np.zeros((N, L))
+	O = rng.standard_normal(size=(N, D))
+	A = np.zeros((M, D))
+	H = np.zeros((N, D))
 	X = np.zeros((M, N))
-	shared.plinkChunk(G, X, f, s, 0, threads)
+	shared.plinkChunk(G, L, X, 0, threads)
 	for p in range(power):
 		if p > 0:
 			O, _ = np.linalg.qr(H, mode="reduced")			
