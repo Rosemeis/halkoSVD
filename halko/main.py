@@ -22,10 +22,10 @@ parser.add_argument("-s", "--seed", metavar="INT", type=int, default=42,
 	help="Set random seed (42)")
 parser.add_argument("-o", "--out", metavar="OUTPUT", default="halko",
 	help="Prefix output name (halko)")
-parser.add_argument("--power", metavar="INT", type=int, default=11,
-	help="Number of power iterations to perform (11)")
+parser.add_argument("--power", metavar="INT", type=int, default=12,
+	help="Number of power iterations to perform (12)")
 parser.add_argument("--extra", metavar="INT", type=int, default=16,
-	help="Number of extra latent factors in Halko")
+	help="Oversampling factor in Halko (16)")
 parser.add_argument("--batch", metavar="INT", type=int, default=4096,
 	help="Mini-batch size for randomized SVD (4096)")
 parser.add_argument("--full", action="store_true",
@@ -66,7 +66,7 @@ def main():
 	from halko import functions
 	from halko import shared
 
-	# Finding length of .fam and .bim files
+	# Reading PLINK files
 	assert os.path.isfile(f"{args.bfile}.bed"), "bed file doesn't exist!"
 	assert os.path.isfile(f"{args.bfile}.bim"), "bim file doesn't exist!"
 	assert os.path.isfile(f"{args.bfile}.fam"), "fam file doesn't exist!"
@@ -96,8 +96,10 @@ def main():
 		np.savetxt(f"{args.out}.eigenvecs", V.T, fmt="%.7f")
 	else:
 		F = np.loadtxt(f"{args.bfile}.fam", usecols=[0,1], dtype=np.str_)
+		h = ["#FID", "IID"] + [f"PC{k}" for k in range(1, args.pca+1)]
 		V = np.hstack((F, np.round(V.T, 7)))
-		np.savetxt(f"{args.out}.eigenvecs", V, fmt="%s")
+		np.savetxt(f"{args.out}.eigenvecs", V, fmt="%s", delimiter="\t", \
+			header="\t".join(h), comments="")
 	print(f"Saved eigenvector(s) as {args.out}.eigenvecs")
 	np.savetxt(f"{args.out}.eigenvals", S**2/float(M), fmt="%.7f")
 	print(f"Saved eigenvalue(s) as {args.out}.eigenvals")
