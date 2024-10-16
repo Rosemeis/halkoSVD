@@ -1,5 +1,5 @@
 # Python implementation of Halko algorithm (PCAone)
-This is an implementation of the PCAone Halko algorithm in Python/Cython. It takes binary PLINK format (*.bed, *.bim, *.fam) as input. For simplicity, mean imputation is performed for missing data.
+This is an implementation of the PCAone Halko algorithm in Python/Cython for genetic data. It takes binary PLINK format (*.bed, *.bim, *.fam) as input. For simplicity, mean imputation is performed for missing data.
 
 It is inspired by the lovely *PCAone* software! Have a look [here](https://github.com/Zilong-Li/PCAone).
 
@@ -8,8 +8,8 @@ It is inspired by the lovely *PCAone* software! Have a look [here](https://githu
 # Install via PyPI
 pip3 install halkoSVD
 
-# Install via Conda
-conda env create -f environment.yml
+# Download and install in a new Conda environment
+conda env create --file environment.yml
 
 # Download and install from GitHub directly
 git clone https://github.com/Rosemeis/halkoSVD.git
@@ -27,4 +27,7 @@ halkoSVD -h
 
 # Extract top 10 PCs with a mini-batch size of 8192 SNPs
 halkoSVD --bfile input --threads 32 --pca 10 --batch 8192 --out halko
+
+# Increase power iterations to 16
+halkoSVD --bfile input --threads 32 --pca 10 --power 16 --out halko
 ```

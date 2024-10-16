@@ -29,15 +29,16 @@ def readPlink(bfile):
 	return G, M, N
 
 ### Mini-batch randomized SVD (PCAone Halko)
-def batchSVD(G, L, N, K, batch, power, seed, threads):
+def batchSVD(G, L, N, K, batch, power, extra, seed, threads):
 	M = G.shape[0]
 	W = ceil(M/batch)
-	D = K + 16
+	D = K + extra
 	rng = np.random.default_rng(seed)
 	O = rng.standard_normal(size=(N, D))
 	A = np.zeros((M, D))
 	H = np.zeros((N, D))
 	for p in range(power):
+		print(f"\rPower iteration {p+1}/{power}", end="")
 		X = np.zeros((batch, N))
 		if p > 0:
 			O, _ = np.linalg.qr(H, mode="reduced")
@@ -57,13 +58,14 @@ def batchSVD(G, L, N, K, batch, power, seed, threads):
 	Uhat, S, V = np.linalg.svd(B, full_matrices=False)
 	U = np.dot(Q, Uhat)
 	del A, B, H, O, Q, R, Uhat, X
+	print("")
 	return U[:,:K], S[:K], V[:K,:]
 
 
 ### Full randomized SVD (PCAone Halko)
-def fullSVD(G, L, N, K, power, seed, threads):
+def fullSVD(G, L, N, K, power, extra, seed, threads):
 	M = G.shape[0]
-	D = K + 16
+	D = K + extra
 	rng = np.random.default_rng(seed)
 	O = rng.standard_normal(size=(N, D))
 	A = np.zeros((M, D))
@@ -71,6 +73,7 @@ def fullSVD(G, L, N, K, power, seed, threads):
 	X = np.zeros((M, N))
 	shared.plinkChunk(G, L, X, 0, threads)
 	for p in range(power):
+		print(f"\rPower iteration {p+1}/{power}", end="")
 		if p > 0:
 			O, _ = np.linalg.qr(H, mode="reduced")			
 		np.dot(X, O, out=A)
@@ -82,4 +85,5 @@ def fullSVD(G, L, N, K, power, seed, threads):
 	Uhat, S, V = np.linalg.svd(B, full_matrices=False)
 	U = np.dot(Q, Uhat)
 	del A, B, H, O, Q, R, Uhat, X
+	print("")
 	return U[:,:K], S[:K], V[:K,:]

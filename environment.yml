@@ -1,8 +1,8 @@
 name: halkoSVD
 dependencies:
-  - python
-  - cython
-  - numpy
+  - python>=3.7
+  - cython>3.0.0
+  - numpy>2.0.0
   - pip
   - pip:
     - halkoSVD

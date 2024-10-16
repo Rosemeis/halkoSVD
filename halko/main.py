@@ -8,7 +8,6 @@ __author__ = "Jonas Meisner"
 import argparse
 import os
 import sys
-from math import ceil
 from time import time
 
 # Argparse
@@ -25,6 +24,8 @@ parser.add_argument("-o", "--out", metavar="OUTPUT", default="halko",
 	help="Prefix output name (halko)")
 parser.add_argument("--power", metavar="INT", type=int, default=11,
 	help="Number of power iterations to perform (11)")
+parser.add_argument("--extra", metavar="INT", type=int, default=16,
+	help="Number of extra latent factors in Halko")
 parser.add_argument("--batch", metavar="INT", type=int, default=4096,
 	help="Mini-batch size for randomized SVD (4096)")
 parser.add_argument("--full", action="store_true",
@@ -71,7 +72,7 @@ def main():
 	assert os.path.isfile(f"{args.bfile}.fam"), "fam file doesn't exist!"
 	print("Reading data...", end="", flush=True)
 	G, M, N = functions.readPlink(args.bfile)
-	print(f"\rLoaded {N} samples and {M} SNPs.")
+	print(f"\rLoaded {N} samples and {M} SNPs.\n")
 
 	# Estimate allele frequencies and scaling
 	f = np.zeros(M)
@@ -84,11 +85,11 @@ def main():
 	# Perform Randomized SVD
 	print(f"Extracting {args.pca} eigenvectors.")
 	if args.full:
-		U, S, V = functions.fullSVD(G, L, N, args.pca, args.power, args.seed, \
-			args.threads)
+		U, S, V = functions.fullSVD(G, L, N, args.pca, args.power, args.extra, \
+			args.seed, args.threads)
 	else:
 		U, S, V = functions.batchSVD(G, L, N, args.pca, args.batch, args.power, \
-			args.seed, args.threads)
+			args.extra, args.seed, args.threads)
 
 	# Save matrices
 	if args.raw:

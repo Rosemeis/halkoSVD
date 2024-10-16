@@ -1,3 +1,26 @@
 [build-system]
-requires = ["setuptools", "cython", "numpy"]
+requires = ["setuptools >= 61.0", "cython > 3.0.0", "numpy > 2.0.0"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "halkoSVD"
+version = "0.2.2"
+authors = [
+	{name = "Jonas Meisner", email = "meisnerucph@gmail.com"},
+]
+requires-python = ">=3.7"
+dependencies = [
+	"cython>3.0.0",
+	"numpy>2.0.0",
+]
+description = "Fast Python/Cython implementation of the PCAone Halko algorithm",
+readme = "README.md"
+classifiers = [
+	"Programming Language :: Python :: 3",
+	"License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+	"Operating System :: OS Independent",
+	"Development Status :: 3 - Alpha",
+]
+
+[project.urls]
+Homepage = "https://github.com/Rosemeis/halkoSVD"
