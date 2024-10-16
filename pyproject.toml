@@ -22,5 +22,8 @@ classifiers = [
 	"Development Status :: 3 - Alpha",
 ]
 
+[project.scripts]
+halkoSVD = "halkoSVD=halko.main:main"
+
 [project.urls]
 Homepage = "https://github.com/Rosemeis/halkoSVD"

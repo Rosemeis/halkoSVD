@@ -14,10 +14,6 @@ extensions = [
 ]
 
 setup(
-    packages=["halko"],
-	entry_points={
-		"console_scripts": ["halkoSVD=halko.main:main"]
-	},
     ext_modules=cythonize(extensions),
     include_dirs=[numpy.get_include()]
 )
