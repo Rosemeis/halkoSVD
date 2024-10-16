@@ -58,7 +58,7 @@ def batchSVD(G, L, N, K, batch, power, extra, seed, threads):
 	Uhat, S, V = np.linalg.svd(B, full_matrices=False)
 	U = np.dot(Q, Uhat)
 	del A, B, H, O, Q, R, Uhat, X
-	print("")
+	print(".\n")
 	return U[:,:K], S[:K], V[:K,:]
 
 
@@ -85,5 +85,5 @@ def fullSVD(G, L, N, K, power, extra, seed, threads):
 	Uhat, S, V = np.linalg.svd(B, full_matrices=False)
 	U = np.dot(Q, Uhat)
 	del A, B, H, O, Q, R, Uhat, X
-	print("")
+	print(".\n")
 	return U[:,:K], S[:K], V[:K,:]

@@ -9,7 +9,8 @@ It is inspired by the lovely *PCAone* software! Have a look [here](https://githu
 pip3 install halkoSVD
 
 # Download and install in a new Conda environment
-conda env create --file environment.yml
+git clone https://github.com/Rosemeis/halkoSVD.git
+conda env create -f halkoSVD/environment.yml
 
 # Download and install from GitHub directly
 git clone https://github.com/Rosemeis/halkoSVD.git
