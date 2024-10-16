@@ -5,7 +5,7 @@ It is inspired by the lovely *PCAone* software! Have a look [here](https://githu
 
 ## Installation
 ```bash
-# Vuild and install via PyPI
+# Build and install via PyPI
 pip install halkoSVD
 
 # Download source and install via pip
