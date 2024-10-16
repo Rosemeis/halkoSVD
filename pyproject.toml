@@ -23,7 +23,7 @@ classifiers = [
 ]
 
 [project.scripts]
-halkoSVD = "halkoSVD=halko.main:main"
+halkoSVD = "halko.main:main"
 
 [project.urls]
 Homepage = "https://github.com/Rosemeis/halkoSVD"
