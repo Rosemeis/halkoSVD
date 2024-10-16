@@ -4,8 +4,8 @@ import numpy
 
 extensions = [
     Extension(
-        "src.halko.shared",
-        ["src/halko/shared.pyx"],
+        "halko.shared",
+        ["halko/shared.pyx"],
         extra_compile_args=["-fopenmp", "-O3", "-g0", '-Wno-unreachable-code'],
         extra_link_args=["-fopenmp"],
         include_dirs=[numpy.get_include()],
