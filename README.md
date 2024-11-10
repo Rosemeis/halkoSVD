@@ -15,7 +15,7 @@ pip install .
 
 # Download source and install in new Conda environment
 git clone https://github.com/Rosemeis/halkoSVD.git
-conda env create -f environment.yml
+conda env create -f halkoSVD/environment.yml
 conda activate halkoSVD
 
 
