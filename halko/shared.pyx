@@ -5,55 +5,79 @@ from cython.parallel import prange
 from libc.math cimport sqrt
 
 # Estimate minor allele frequencies
-cpdef void estimateFreq(const unsigned char[:,::1] G, double[::1] f, const int N, \
-		const int t) noexcept nogil:
+cpdef void createLookup(const unsigned char[:,::1] G, double[:,::1] L, const size_t N) \
+		noexcept nogil:
 	cdef:
-		int M = G.shape[0]
-		int B = G.shape[1]
-		int b, i, j, bytepart
-		double n
+		size_t M = G.shape[0]
+		size_t B = G.shape[1]
+		size_t b, g, i, j, bytepart
+		double d, f, n
 		unsigned char[4] recode = [2, 9, 1, 0]
 		unsigned char mask = 3
 		unsigned char byte
-	for j in prange(M, num_threads=t):
+	for j in prange(M):
+		# Estimate allele frequency
 		i = 0
+		f = 0.0
 		n = 0.0
 		for b in range(B):
 			byte = G[j,b]
 			for bytepart in range(4):
 				if recode[byte & mask] != 9:
-					f[j] += <double>recode[byte & mask]
+					f += <double>recode[byte & mask]
 					n = n + 1.0
 				byte = byte >> 2
 				i = i + 1
 				if i == N:
 					break
-		f[j] /= (2.0*n)
+		f = f/<double>(2.0*n)
+		d = 1.0/sqrt(2.0*f*(1.0 - f))
 
-# Create look-up table of standardized genotypes
-cpdef void createLookup(double[:,::1] L, const double[::1] f, const int t) \
-		noexcept nogil:
-	cdef:
-		int M = L.shape[0]
-		int G = L.shape[1]
-		int g, j
-	for j in prange(M, num_threads=t):
-		for g in range(3):
-			L[j,g] = (<double>g - 2.0*f[j])/sqrt(2.0*f[j]*(1.0 - f[j]))
+		# Fill look-up table
+		L[j,0] = (0.0 - 2.0*f)*d
+		L[j,1] = (1.0 - 2.0*f)*d
+		L[j,2] = (2.0 - 2.0*f)*d
 
-# Load standardized chunk from PLINK file for SVD
+# Load standardized chunk from PLINK file for Halko randomixed SVD
 cpdef void plinkChunk(const unsigned char[:,::1] G, const double[:,::1] L, \
-		double[:,::1] X, const int M_b, const int t) noexcept nogil:
+		double[:,::1] X, const size_t M_b) noexcept nogil:
 	cdef:
-		int M = X.shape[0]
-		int N = X.shape[1]
-		int B = G.shape[1]
-		int b, d, i, j, bytepart
+		size_t M = X.shape[0]
+		size_t N = X.shape[1]
+		size_t B = G.shape[1]
+		size_t b, d, i, j, bytepart
 		unsigned char[4] recode = [2, 9, 1, 0]
 		unsigned char mask = 3
 		unsigned char g, byte
-	for j in prange(M, num_threads=t):
+	for j in prange(M):
 		d = M_b + j
+		i = 0		
+		for b in range(B):
+			byte = G[d,b]
+			for bytepart in range(4):
+				g = recode[byte & mask]
+				if g != 9:
+					X[j,i] = L[d,g]
+				else:
+					X[j,i] = 0.0
+				byte = byte >> 2
+				i = i + 1
+				if i == N:
+					break
+
+# Load standardized chunk from PLINK file for PCAone randomixed SVD
+cpdef void plinkBlock(const unsigned char[:,::1] G, const double[:,::1] L, \
+		double[:,::1] X, const unsigned int[::1] s, const size_t M_b) noexcept nogil:
+	cdef:
+		size_t M = X.shape[0]
+		size_t N = X.shape[1]
+		size_t B = G.shape[1]
+		size_t b, d, i, j, bytepart
+		unsigned char[4] recode = [2, 9, 1, 0]
+		unsigned char mask = 3
+		unsigned char g, byte
+	for j in prange(M):
+		d = s[M_b + j]
 		i = 0		
 		for b in range(B):
 			byte = G[d,b]

@@ -1,5 +1,6 @@
 """
-Main caller for PCAone Halko algorithm.
+halkoSVD.
+Main caller for Python/Cython Halko randomized SVD implementation.
 """
 
 __author__ = "Jonas Meisner"
@@ -22,14 +23,12 @@ parser.add_argument("-s", "--seed", metavar="INT", type=int, default=42,
 	help="Set random seed (42)")
 parser.add_argument("-o", "--out", metavar="OUTPUT", default="halko",
 	help="Prefix output name (halko)")
-parser.add_argument("--power", metavar="INT", type=int, default=12,
-	help="Number of power iterations to perform (12)")
-parser.add_argument("--extra", metavar="INT", type=int, default=16,
-	help="Oversampling factor in Halko (16)")
-parser.add_argument("--batch", metavar="INT", type=int, default=4096,
-	help="Mini-batch size for randomized SVD (4096)")
-parser.add_argument("--full", action="store_true",
-	help="Perform full randomized SVD in memory")
+parser.add_argument("--power", metavar="INT", type=int, default=11,
+	help="Number of power iterations to perform (11)")
+parser.add_argument("--batch", metavar="INT", type=int, default=8192,
+	help="Mini-batch size for randomized SVD (8192)")
+parser.add_argument("--pcaone", action="store_true",
+	help="Perform PCAone block-based power iterations")
 parser.add_argument("--loadings", action="store_true",
 	help="Save loadings")
 parser.add_argument("--raw", action="store_true",
@@ -43,12 +42,16 @@ def main():
 	if len(sys.argv) < 2:
 		parser.print_help()
 		sys.exit()
-	print(f"Fast PCAone Halko implementation using {args.threads} thread(s).")
-	if args.full:
-		print("Computing randomized SVD with data in memory.")
-	else:
-		print(f"Computing randomized SVD with a batch-size of {args.batch} SNPs.")
+	print(f"Fast Halko implementation using {args.threads} thread(s).")
+	print(f"Computing randomized SVD with a batch-size of {args.batch} SNPs.")
+
+	# Check input
 	assert args.bfile is not None, "No input data (--bfile)!"
+	assert args.pca > 0, "Please select a valid number of PCs > 0!"
+	assert args.threads > 0, "Please select a valid number of threads!"
+	assert args.seed >= 0, "Please select a valid seed!"
+	assert args.power > 0, "Please select a valid number of power iterations!"
+	assert args.batch > 0, "Please select a valid value for batch size!"
 	start = time()
 
 	# Control threads of external numerical libraries
@@ -74,22 +77,18 @@ def main():
 	G, M, N = functions.readPlink(args.bfile)
 	print(f"\rLoaded {N} samples and {M} SNPs.\n")
 
-	# Estimate allele frequencies and scaling
-	f = np.zeros(M)
+	# Create look-up table of standardized genotypes
 	L = np.zeros((M, 3))
-	shared.estimateFreq(G, f, N, args.threads)
-	assert (np.min(f) > 0.0) & (np.max(f) < 1.0), "Please perform MAF filtering!"
-	shared.createLookup(L, f, args.threads)
-	del f
+	shared.createLookup(G, L, N)
 
 	# Perform Randomized SVD
 	print(f"Extracting {args.pca} eigenvectors.")
-	if args.full:
-		U, S, V = functions.fullSVD(G, L, N, args.pca, args.power, args.extra, \
-			args.seed, args.threads)
+	rng = np.random.default_rng(args.seed)
+	if args.pcaone:
+		U, S, V = functions.pcaoneSVD(G, L, N, args.pca, args.batch, rng)
 	else:
-		U, S, V = functions.batchSVD(G, L, N, args.pca, args.batch, args.power, \
-			args.extra, args.seed, args.threads)
+		U, S, V = functions.halkoSVD(G, L, N, args.pca, args.batch, args.power, rng)
+	del G, L
 
 	# Save matrices
 	if args.raw:
