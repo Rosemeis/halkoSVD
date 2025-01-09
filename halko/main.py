@@ -23,12 +23,10 @@ parser.add_argument("-s", "--seed", metavar="INT", type=int, default=42,
 	help="Set random seed (42)")
 parser.add_argument("-o", "--out", metavar="OUTPUT", default="halko",
 	help="Prefix output name (halko)")
-parser.add_argument("--power", metavar="INT", type=int, default=11,
-	help="Number of power iterations to perform (11)")
+parser.add_argument("--power", metavar="INT", type=int, default=10,
+	help="Number of power iterations to perform (10)")
 parser.add_argument("--batch", metavar="INT", type=int, default=8192,
 	help="Mini-batch size for randomized SVD (8192)")
-parser.add_argument("--pcaone", action="store_true",
-	help="Perform PCAone block-based power iterations")
 parser.add_argument("--loadings", action="store_true",
 	help="Save loadings")
 parser.add_argument("--raw", action="store_true",
@@ -42,7 +40,7 @@ def main():
 	if len(sys.argv) < 2:
 		parser.print_help()
 		sys.exit()
-	print(f"Fast Halko implementation using {args.threads} thread(s).")
+	print(f"Fast randomized SVD implementation using {args.threads} thread(s).")
 	print(f"Computing randomized SVD with a batch-size of {args.batch} SNPs.")
 
 	# Check input
@@ -67,40 +65,32 @@ def main():
 	# Load numerical libraries
 	import numpy as np
 	from halko import functions
-	from halko import shared
 
 	# Reading PLINK files
 	assert os.path.isfile(f"{args.bfile}.bed"), "bed file doesn't exist!"
 	assert os.path.isfile(f"{args.bfile}.bim"), "bim file doesn't exist!"
 	assert os.path.isfile(f"{args.bfile}.fam"), "fam file doesn't exist!"
 	print("Reading data...", end="", flush=True)
-	G, M, N = functions.readPlink(args.bfile)
-	print(f"\rLoaded {N} samples and {M} SNPs.\n")
-
-	# Create look-up table of standardized genotypes
-	L = np.zeros((M, 3))
-	shared.createLookup(G, L, N)
+	G, f, d = functions.readPlink(args.bfile)
+	print(f"\rLoaded {G.shape[1]} samples and {G.shape[0]} SNPs.\n")
 
 	# Perform Randomized SVD
 	print(f"Extracting {args.pca} eigenvectors.")
 	rng = np.random.default_rng(args.seed)
-	if args.pcaone:
-		U, S, V = functions.pcaoneSVD(G, L, N, args.pca, args.batch, rng)
-	else:
-		U, S, V = functions.halkoSVD(G, L, N, args.pca, args.batch, args.power, rng)
-	del G, L
+	U, S, V = functions.randomizedSVD(G, f, d, args.pca, args.batch, args.power, rng)
+	del G, f, d
 
 	# Save matrices
 	if args.raw:
-		np.savetxt(f"{args.out}.eigenvecs", V.T, fmt="%.7f")
+		np.savetxt(f"{args.out}.eigenvecs", V, fmt="%.7f")
 	else:
 		F = np.loadtxt(f"{args.bfile}.fam", usecols=[0,1], dtype=np.str_)
 		h = ["#FID", "IID"] + [f"PC{k}" for k in range(1, args.pca+1)]
-		V = np.hstack((F, np.round(V.T, 7)))
+		V = np.hstack((F, np.round(V, 7)))
 		np.savetxt(f"{args.out}.eigenvecs", V, fmt="%s", delimiter="\t", \
 			header="\t".join(h), comments="")
 	print(f"Saved eigenvector(s) as {args.out}.eigenvecs")
-	np.savetxt(f"{args.out}.eigenvals", S**2/float(M), fmt="%.7f")
+	np.savetxt(f"{args.out}.eigenvals", S**2/float(U.shape[0]), fmt="%.7f")
 	print(f"Saved eigenvalue(s) as {args.out}.eigenvals")
 
 	# Save loadings

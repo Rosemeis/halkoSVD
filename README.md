@@ -1,5 +1,5 @@
-# Cython/Python implementation of Halko algorithm (PCAone)
-This is a fast implementation of the PCAone Halko algorithm in Python/Cython for genotype data. It takes binary PLINK format (*.bed, *.bim, *.fam) as input. For simplicity, mean imputation is performed for missing data.
+# Cython/Python implementation of Halko algorithm
+This is a fast implementation of Halko algorithm in Python/Cython for genotype data. It takes binary PLINK format (*.bed, *.bim, *.fam) as input. For simplicity, mean imputation is performed for missing data.
 
 It is inspired by the lovely *PCAone* software! Have a look [here](https://github.com/Zilong-Li/PCAone).
 

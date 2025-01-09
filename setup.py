@@ -15,7 +15,7 @@ extensions = [
 
 setup(
 	name="halkoSVD",
-	version="0.3.0",
+	version="0.4.0",
 	author="Jonas Meisner",
 	author_email="meisnerucph@gmail.com",
 	description="Fast Python/Cython implementation of the PCAone Halko algorithm",
