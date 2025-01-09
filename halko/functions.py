@@ -25,6 +25,14 @@ def readPlink(bfile):
 	shared.expandGeno(D, G, f, d)
 	return G, f, d
 
+# SVD through eigendecomposition
+def eigSVD(C):
+	D, V = np.linalg.eigh(np.dot(C.T, C))
+	S = np.sqrt(D)
+	U = np.dot(C, V*(1.0/S))
+	return np.ascontiguousarray(U[:,::-1]), np.ascontiguousarray(S[::-1]), \
+		np.ascontiguousarray(V[:,::-1])
+
 # Batched randomized SVD with dynamic shifts
 def randomizedSVD(G, f, d, K, batch, power, rng):
 	M, N = G.shape
@@ -43,7 +51,7 @@ def randomizedSVD(G, f, d, K, batch, power, rng):
 			X = np.zeros((M - M_w, N))
 		shared.plinkChunk(G, X, f, d, M_w)
 		H += np.dot(X.T, O[M_w:(M_w + X.shape[0])])
-	Q, _ = np.linalg.qr(H)
+	Q, _, _ = eigSVD(H)
 	H.fill(0.0)
 
 	# Power iterations
@@ -57,7 +65,7 @@ def randomizedSVD(G, f, d, K, batch, power, rng):
 			shared.plinkChunk(G, X, f, d, M_w)
 			A[M_w:(M_w + X.shape[0])] = np.dot(X, Q)
 			H += np.dot(X.T, A[M_w:(M_w + X.shape[0])])
-		Q, S, _ = np.linalg.svd(H - a*Q, full_matrices=False)
+		Q, S, _ = eigSVD(H - a*Q)
 		H.fill(0.0)
 		if S[-1] > a:
 			a = 0.5*(S[-1] + a)
