@@ -38,11 +38,10 @@ def randomizedSVD(G, f, d, K, batch, power, rng):
 	M, N = G.shape
 	W = ceil(M/batch)
 	a = 0.0
-	L = K + 10
-	A = np.zeros((M, L))
+	L = max(K + 10, 20)
 	H = np.zeros((N, L))
 	X = np.zeros((batch, N))
-	O = rng.standard_normal(size=(M, L))
+	A = rng.standard_normal(size=(M, L))
 
 	# Prime iteration
 	for w in np.arange(W):
@@ -50,7 +49,7 @@ def randomizedSVD(G, f, d, K, batch, power, rng):
 		if w == (W-1): # Last batch
 			X = np.zeros((M - M_w, N))
 		shared.plinkChunk(G, X, f, d, M_w)
-		H += np.dot(X.T, O[M_w:(M_w + X.shape[0])])
+		H += np.dot(X.T, A[M_w:(M_w + X.shape[0])])
 	Q, _, _ = eigSVD(H)
 	H.fill(0.0)
 
@@ -79,6 +78,6 @@ def randomizedSVD(G, f, d, K, batch, power, rng):
 			X = np.zeros((M - M_w, N))
 		shared.plinkChunk(G, X, f, d, M_w)
 		A[M_w:(M_w + X.shape[0])] = np.dot(X, Q)
-	U, S, V = np.linalg.svd(A, full_matrices=False)
+	U, S, V = eigSVD(A)
 	print(".\n")
 	return U[:,:K], S[:K], np.dot(Q, V)[:,:K]
