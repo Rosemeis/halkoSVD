@@ -26,10 +26,10 @@ def readPlink(bfile):
 	return G, f, d
 
 # SVD through eigendecomposition
-def eigSVD(C):
-	D, V = np.linalg.eigh(np.dot(C.T, C))
+def eigSVD(H):
+	D, V = np.linalg.eigh(np.dot(H.T, H))
 	S = np.sqrt(D)
-	U = np.dot(C, V*(1.0/S))
+	U = np.dot(H, V*(1.0/S))
 	return np.ascontiguousarray(U[:,::-1]), np.ascontiguousarray(S[::-1]), \
 		np.ascontiguousarray(V[:,::-1])
 
@@ -65,7 +65,8 @@ def randomizedSVD(G, f, d, K, batch, power, rng):
 			shared.plinkChunk(G, X, f, d, M_w)
 			A[M_w:(M_w + X.shape[0])] = np.dot(X, Q)
 			H += np.dot(X.T, A[M_w:(M_w + X.shape[0])])
-		Q, S, _ = eigSVD(H - a*Q)
+		H -= a*Q
+		Q, S, _ = eigSVD(H)
 		H.fill(0.0)
 		if S[-1] > a:
 			a = 0.5*(S[-1] + a)
