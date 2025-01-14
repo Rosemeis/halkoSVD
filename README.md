@@ -31,9 +31,8 @@ halkoSVD --bfile input --threads 32 --pca 10 --out halko
 ```
 
 ### Options
-* `--pcaone`, perform fast PCAone block iterations
 * `--seed`, set random seed for reproducibility (42)
-* `--power`, specify the number of power iterations (11)
+* `--power`, specify the number of power iterations (10)
 * `--batch`, specify the batch size to process SNPs (8192)
 * `--loadings`, save the SNP loadings
 * `--raw`, only output eigenvectors without FID/IID

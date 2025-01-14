@@ -33,7 +33,7 @@ def eigSVD(H):
 	return np.ascontiguousarray(U[:,::-1]), np.ascontiguousarray(S[::-1]), \
 		np.ascontiguousarray(V[:,::-1])
 
-# Batched randomized SVD with dynamic shifts
+# Batched randomized SVD with dynamic shift
 def randomizedSVD(G, f, d, K, batch, power, rng):
 	M, N = G.shape
 	W = ceil(M/batch)
