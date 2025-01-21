@@ -12,7 +12,7 @@ import sys
 from time import time
 
 # Argparse
-parser = argparse.ArgumentParser(prog="halko")
+parser = argparse.ArgumentParser(prog="halkoSVD")
 parser.add_argument("-b", "--bfile", metavar="PLINK",
 	help="Prefix for PLINK files (.bed, .bim, .fam)")
 parser.add_argument("-e", "--pca", metavar="INT", type=int, default=10,

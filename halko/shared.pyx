@@ -40,10 +40,13 @@ cpdef void plinkChunk(const unsigned char[:,::1] G, double[:,::1] X, double[::1]
 		size_t M = X.shape[0]
 		size_t N = X.shape[1]
 		size_t i, j, k
+		double fk, dk
 	for j in prange(M):
 		k = M_w + j
+		fk = f[k]
+		dk = d[k]
 		for i in range(N):
 			if G[k,i] != 9:
-				X[j,i] = (G[k,i] - 2.0*f[k])*d[k]
+				X[j,i] = (G[k,i] - 2.0*fk)*dk
 			else:
 				X[j,i] = 0.0
