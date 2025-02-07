@@ -47,6 +47,6 @@ cpdef void plinkChunk(const unsigned char[:,::1] G, double[:,::1] X, double[::1]
 		dk = d[k]
 		for i in range(N):
 			if G[k,i] != 9:
-				X[j,i] = (G[k,i] - 2.0*fk)*dk
+				X[j,i] = (<double>G[k,i] - 2.0*fk)*dk
 			else:
 				X[j,i] = 0.0
