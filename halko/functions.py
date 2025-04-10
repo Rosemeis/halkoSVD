@@ -30,8 +30,7 @@ def eigSVD(H):
 	D, V = np.linalg.eigh(np.dot(H.T, H))
 	S = np.sqrt(D)
 	U = np.dot(H, V*(1.0/S))
-	return np.ascontiguousarray(U[:,::-1]), np.ascontiguousarray(S[::-1]), \
-		np.ascontiguousarray(V[:,::-1])
+	return np.ascontiguousarray(U[:,::-1]), np.ascontiguousarray(S[::-1]), np.ascontiguousarray(V[:,::-1])
 
 # Batched randomized SVD with dynamic shift
 def randomizedSVD(G, f, d, K, batch, power, rng):

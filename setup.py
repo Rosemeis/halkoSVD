@@ -6,8 +6,8 @@ extensions = [
     Extension(
         name="halko.shared",
         sources=["halko/shared.pyx"],
-        extra_compile_args=["-fopenmp", "-O3", "-g0", '-Wno-unreachable-code'],
-        extra_link_args=["-fopenmp"],
+		extra_compile_args=['-fopenmp', '-O3', '-ffast-math'],
+		extra_link_args=['-fopenmp', '-lm'],
         include_dirs=[numpy.get_include()],
         define_macros=[('NPY_NO_DEPRECATED_API', 'NPY_1_7_API_VERSION')]
     )
@@ -15,7 +15,7 @@ extensions = [
 
 setup(
 	name="halkoSVD",
-	version="0.4.1",
+	version="0.5.0",
 	author="Jonas Meisner",
 	author_email="meisnerucph@gmail.com",
 	description="Fast Python/Cython implementation of the PCAone Halko algorithm",
